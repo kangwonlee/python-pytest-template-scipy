@@ -1,0 +1,5 @@
+[project]
+name="python-pytest"
+version="2024.03.02"
+[dependencies]
+requests
