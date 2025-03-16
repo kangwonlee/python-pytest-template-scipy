@@ -17,10 +17,10 @@ RUN sh /uv-installer.sh && rm /uv-installer.sh
 # Ensure the installed binary is on the `PATH`
 ENV PATH="/root/.local/bin/:$PATH"
 
-USER runner
-
 COPY pyproject.toml pyproject.toml
 RUN uv sync
+
+USER runner
 
 RUN python3 -c "import glob; files = glob.glob('/tests/test_*.py'); print('Found', len(files), 'files:', files); assert files, 'No files in /tests/!'"
 
