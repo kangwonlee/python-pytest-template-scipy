@@ -1,3 +1,4 @@
+# begin dispatch.py
 import logging
 import os
 import sys
@@ -9,20 +10,30 @@ logging.basicConfig(level=logging.INFO)
 
 
 repository = os.environ["GITHUB_REPOSITORY"]
-q_repo = os.environ["Q_REPO"]
+assert repository.strip(), "GITHUB_REPOSITORY is not set"
+
+
+q_repo = os.getenv('Q_REPO', "")
+if not q_repo.strip():
+    q_repo = repository.replace('pytest', 'homework')
+
 
 url = f"https://api.github.com/repos/{q_repo}/dispatches"
-token = os.environ['TOKEN']
-image_url = os.environ['IMAGE_URL']
-
 logging.info(f"Dispatching to {url}")
 
+
+token = os.environ['TOKEN']
+image_url = os.environ['IMAGE_URL']
+logging.info(f"Use image at {image_url}")
 
 # Headers
 headers = {
     "Accept": "application/vnd.github+json",  # Updated from everest-preview
     "Authorization": f"Bearer {token}",
 }
+
+assert repository.strip(), "please set repository"
+assert image_url.strip(), "please set IMAGE_URL"
 
 # Payload
 payload = {
@@ -40,7 +51,8 @@ assert response.ok, response.text
 
 # Check result
 if response.status_code == 204:
-    print("Dispatch succeeded!")
+    logging.info("Dispatch succeeded!")
 else:
-    print(f"Dispatch failed with status {response.status_code}: {response.text}")
+    logging.error(f"Dispatch failed with status {response.status_code}: {response.text}")
     sys.exit(1)  # Fail the workflow
+# end dispatch.py
