@@ -1,54 +1,82 @@
 import ast
-import logging
+import functools
 import os
 import pathlib
+import sys
+
 
 from typing import Tuple
+
 
 import pytest
 
 
 file_path = pathlib.Path(__file__)
-test_folder = file_path.parent.absolute()
-proj_folder = pathlib.Path(
-    os.getenv(
-        'STUDENT_CODE_FOLDER',
-        test_folder.parent.absolute()
-    )
-)
-
-logger = logging.getLogger(__file__)
-logger.setLevel(logging.INFO)
+test_folder = file_path.parent.resolve()
+proj_folder = test_folder.parent.resolve()
 
 
-def py_files() -> Tuple[pathlib.Path]:
-    return tuple(proj_folder.glob("*.py"))
+student_code_folder = pathlib.Path(os.getenv('STUDENT_CODE_FOLDER', proj_folder))
+sys.path.insert(0, str(student_code_folder))
 
 
-@pytest.mark.parametrize("py_file", py_files())
-def test_syntax(py_file:pathlib.Path):
+@functools.lru_cache()
+def read_code(file_path:pathlib.Path) -> str:
+    assert file_path.exists()
+    assert file_path.is_file()
+    return file_path.read_text(encoding="utf-8")
 
-    code = py_file.read_text(encoding="utf-8")
 
+@functools.lru_cache()
+def parse_code(file_path:pathlib.Path) -> ast.AST:
     try:
-        ast.parse(code)
+        tree = ast.parse(read_code(file_path))
     except SyntaxError as e:
-        pytest.fail(f"Syntax error in file: {py_file.relative_to(proj_folder)}\n{e}")
+        pytest.fail(f"Syntax error in file: {file_path.relative_to(proj_folder)}\n{e}")
+    return tree
 
 
-@pytest.mark.parametrize("py_file", py_files())
-def test_module(py_file:pathlib.Path):
+def test_syntax_validity(py_file:pathlib.Path):
+    parse_code(py_file)
 
-    code = py_file.read_text(encoding="utf-8")
 
-    tree = ast.parse(code)
+@pytest.fixture(scope="session")  # Session scope to share the allowed modules across tests
+def allowed_modules() -> Tuple[str]:
+    return tuple()
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                logger.info(f"Import: {alias.name}")
-                if "numpy" == alias.name:
-                    pytest.fail(f"Import of numpy in {py_file.relative_to(proj_folder)}")
-        elif isinstance(node, ast.ImportFrom):
-            if node.module == "numpy":
-                pytest.fail(f"Import of numpy in {py_file.relative_to(proj_folder)}")
+
+def test_allowed_imports(py_file:pathlib.Path, allowed_modules:Tuple[str]):
+    for node in ast.walk(parse_code(py_file)):
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            module_name = node.module if isinstance(node, ast.ImportFrom) else node.names[0].name
+            if module_name not in allowed_modules:
+                pytest.fail(
+                    f"Import of disallowed module '{module_name}' in {py_file}\n"
+                    f"{py_file.relative_to(proj_folder)} 파일에서 '{module_name}' 모듈을 import 않기 바랍니다."
+                )
+
+
+ALLOWED_FUNCTIONS = {'map', 'list',}
+
+class FunctionChecker(ast.NodeVisitor):
+    def __init__(self):
+        self.disallowed = []
+
+    def visit_Call(self, node):
+        if isinstance(node.func, ast.Name) and node.func.id not in ALLOWED_FUNCTIONS:
+            self.disallowed.append((node.func.id, node.lineno))
+        self.generic_visit(node)
+
+
+def test_allowed_functions(py_file:pathlib.Path):
+    checker = FunctionChecker()
+    checker.visit(parse_code(py_file))
+    if checker.disallowed:
+        pytest.fail(
+            f"The {py_file} code calls function(s) {checker.disallowed} "
+            f"but allowed functions are {ALLOWED_FUNCTIONS}\n"
+        )
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])
