@@ -36,6 +36,7 @@ jobs:
           echo "DOCKER_IMAGE_TAG=$SHORT_SHA" >> $GITHUB_ENV
           echo "GHCR_IMAGE_NAME=ghcr.io/${{ github.repository }}:$SHORT_SHA" >> $GITHUB_ENV
           echo "GHCR_IMAGE_NAME=ghcr.io/${{ github.repository }}:$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "GHCR_IMAGE_LATEST=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_ENV
 
       - name: Build and push
         id: build
@@ -45,12 +46,11 @@ jobs:
           context: .
           file: Dockerfile
           platforms: linux/arm64,linux/amd64
-          tags: ${{ env.GHCR_IMAGE_NAME }}
+          tags: ${{ env.GHCR_IMAGE_NAME }},${{ env.GHCR_IMAGE_LATEST }}
           push: true  # push images
           # Pass GHCR creds to builder for pulling private base image
           secrets: |
             "GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}"
-
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v5
