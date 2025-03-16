@@ -56,7 +56,7 @@ def x(expected:np.ndarray, a:float) -> Tuple[float]:
 
 @pytest.fixture
 def result(a:float, x:Tuple[float]) -> List[float]:
-    return exercise.wk03(a, x)
+    return exercise.mul_list_num(a, x)
 
 
 def test_is_return_none(result:List[int]):
