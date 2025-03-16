@@ -22,6 +22,6 @@ RUN uv sync
 
 USER runner
 
-RUN python3 -c "import pandas as pd; import glob; files = glob.glob('/tests/test_*.py'); print('Found', len(files), 'files:', files); assert files, 'No files in /tests/!'"
+RUN python3 -c "import pandas as pd; print(pd.__file__);import glob; files = glob.glob('/tests/test_*.py'); print('Found', len(files), 'files:', files); assert files, 'No files in /tests/!'"
 
 WORKDIR /app/
