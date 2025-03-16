@@ -6,22 +6,9 @@ WORKDIR /tests/
 RUN mkdir -p /tests/
 COPY tests/* /tests/
 
-USER root
+COPY requirements.txt requirements.txt
+RUN python3 -m pip install --no-cache-dir --requirement requirements.txt
 
-# Download the latest installer
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-
-# Run the installer then remove it
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-
-# Ensure the installed binary is on the `PATH`
-ENV PATH="/root/.local/bin/:$PATH"
-
-COPY pyproject.toml pyproject.toml
-RUN uv sync
-
-USER runner
-
-RUN python3 -c "import pandas as pd; print(pd.__file__);import glob; files = glob.glob('/tests/test_*.py'); print('Found', len(files), 'files:', files); assert files, 'No files in /tests/!'"
+RUN which python3 && python3 -c "import pandas as pd; print(pd.__file__);import glob; files = glob.glob('/tests/test_*.py'); print('Found', len(files), 'files:', files); assert files, 'No files in /tests/!'"
 
 WORKDIR /app/
