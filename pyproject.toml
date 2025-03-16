@@ -1,5 +1,11 @@
 [project]
-name="python-pytest"
-version="2024.03.02"
-[dependencies]
-requests
+name="eca-pytest-030"
+version="2024.03.16"
+dependencies=[
+    "numpy",
+    "pandas",
+    "pytest",
+    "pytest-json-report",
+    "pytest-xdist",
+    "requests",
+    "tabulate"]
