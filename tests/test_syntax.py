@@ -36,8 +36,8 @@ def parse_code(file_path:pathlib.Path) -> ast.AST:
     return tree
 
 
-def test_syntax_validity(py_file:pathlib.Path):
-    parse_code(py_file)
+def test_syntax_validity(script_path:pathlib.Path):
+    parse_code(script_path)
 
 
 @pytest.fixture(scope="session")  # Session scope to share the allowed modules across tests
@@ -45,14 +45,14 @@ def allowed_modules() -> Tuple[str]:
     return tuple()
 
 
-def test_allowed_imports(py_file:pathlib.Path, allowed_modules:Tuple[str]):
-    for node in ast.walk(parse_code(py_file)):
+def test_allowed_imports(script_path:pathlib.Path, allowed_modules:Tuple[str]):
+    for node in ast.walk(parse_code(script_path)):
         if isinstance(node, (ast.Import, ast.ImportFrom)):
             module_name = node.module if isinstance(node, ast.ImportFrom) else node.names[0].name
             if module_name not in allowed_modules:
                 pytest.fail(
-                    f"Import of disallowed module '{module_name}' in {py_file}\n"
-                    f"{py_file.relative_to(proj_folder)} 파일에서 '{module_name}' 모듈을 import 않기 바랍니다."
+                    f"Import of disallowed module '{module_name}' in {script_path}\n"
+                    f"{script_path.relative_to(proj_folder)} 파일에서 '{module_name}' 모듈을 import 않기 바랍니다."
                 )
 
 
@@ -68,12 +68,12 @@ class FunctionChecker(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def test_allowed_functions(py_file:pathlib.Path):
+def test_allowed_functions(script_path:pathlib.Path):
     checker = FunctionChecker()
-    checker.visit(parse_code(py_file))
+    checker.visit(parse_code(script_path))
     if checker.disallowed:
         pytest.fail(
-            f"The {py_file} code calls function(s) {checker.disallowed} "
+            f"The {script_path} code calls function(s) {checker.disallowed} "
             f"but allowed functions are {ALLOWED_FUNCTIONS}\n"
         )
 

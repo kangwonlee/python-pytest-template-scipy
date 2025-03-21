@@ -19,13 +19,8 @@ proj_folder = pathlib.Path(
 )
 
 
-def py_files() -> Tuple[pathlib.Path]:
-    return tuple(proj_folder.glob("*.py"))
-
-
-@pytest.mark.parametrize("py_file", py_files())
-def test_function_only_in_py_file(py_file:pathlib.Path):
-    with open(py_file, 'r') as file:
+def test_function_only_in_py_file(script_path:pathlib.Path):
+    with open(script_path, 'r') as file:
         lines = file.readlines()
 
     for line in lines:
