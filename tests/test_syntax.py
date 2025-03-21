@@ -1,3 +1,4 @@
+# begin tests/test_syntax.py
 import ast
 import functools
 import os
@@ -80,3 +81,4 @@ def test_allowed_functions(script_path:pathlib.Path):
 
 if __name__ == "__main__":
     pytest.main([__file__])
+# end tests/test_syntax.py

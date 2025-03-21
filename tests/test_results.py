@@ -1,8 +1,8 @@
+# begin tests/test_results.py
 import os
 import pathlib
 import random
 import sys
-
 from typing import List, Tuple
 
 
@@ -81,3 +81,8 @@ def test_isclose(result:List[int], a:Tuple[int], x:Tuple[int], expected:int):
         "Please double-check your calculations for these elements.\n"
         "이 요소들에 대한 계산을 다시 확인하기 바랍니다.\n"
     )
+
+
+if "__main__" == __name__:
+    pytest.main(['--verbose', __file__])
+# end tests/test_results.py

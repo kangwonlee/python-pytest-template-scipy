@@ -1,7 +1,7 @@
+# begin tests/test_style.py
 import os
 import pathlib
 import subprocess
-
 from typing import Tuple
 
 
@@ -52,3 +52,4 @@ def test_git_log(git_log:Tuple[str]):
         if "github-classroom[bot]" != n:
             new_commits.append(line)
     assert new_commits, "No new commits"
+# end tests/test_style.py
