@@ -1,4 +1,5 @@
 # python-pytest-template
+
 Template for grader image builders for python assignments
 
 ## Purpose
@@ -11,8 +12,8 @@ Template for grader image builders for python assignments
 1. Go to the `Settings` tab of your repository and click on `Actions` on the left sidebar.
     1. Click on `General` and go to `Workflow permissions`.
     1. Choose `Read and write permissions` and <kbd>Save</kbd>.
-1. Edit `tests/test_syntax.py` to define the allowed modules and functions
-1. Customize `tests/test_results.py` to define the expected results
+1. Edit `tests/test_syntax.py` to set allowed modules and functions.
+1. Customize `tests/test_results.py` to define the expected results.
 1. Push to GitHub : `build.yml` builds your image and pushes to GHCR.
 * `script_path` fixture will be available if your test script in the `tests/` folder imports `pytest`.
 * Customize `requirements.txt` to include additional dependencies or change the test command.
