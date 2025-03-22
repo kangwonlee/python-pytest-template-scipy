@@ -1,0 +1,5 @@
+# begin requirements.txt
+pytest>=8.3
+pytest-json-report
+pytest-xdist
+# end requirements.txt
