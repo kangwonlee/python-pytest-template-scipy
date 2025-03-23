@@ -45,5 +45,5 @@ jobs:
           push: true
           secrets: |
             "GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}"
-          
+
 # end build.yml
