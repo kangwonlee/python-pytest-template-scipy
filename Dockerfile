@@ -1,30 +1,30 @@
 # begin Dockerfile
-FROM python:3.11.11-alpine
 
+FROM ghcr.io/kangwonlee/edu-base-raw:742e654
 
-RUN apk add --no-cache git
+USER root
 
+# TODO : verify branch name or set a version
 
-RUN adduser runner --uid 1001 --disabled-password
+RUN git clone --depth=1 --branch feature/multi-service https://github.com/kangwonlee/gemini-python-tutor /app/temp/ \
+    && mkdir -p /app/ai_tutor/ \
+    && mv /app/temp/*.py /app/ai_tutor \
+    && mv /app/temp/locale/ /app/ai_tutor/locale/
+
+RUN uv pip install --system --requirement /app/temp/requirements.txt \
+    && rm -rf /app/temp \
+    && chown -R runner:runner /app/ai_tutor/
+
 USER runner
 
+WORKDIR /tests/
 
-WORKDIR /app
+RUN mkdir -p /tests/
 
+COPY tests/* /tests/
 
-COPY requirements.txt /requirements.txt
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install --no-cache-dir --user --requirement /requirements.txt
+RUN python3 -c "import pytest; import requests; import glob; files = glob.glob('/tests/test_*.py'); print('Found', len(files), 'files:', files); assert files, 'No files in /tests/!'"
 
+WORKDIR /app/
 
-# Optional: Add AI tutor for LLM-generated test feedback
-# RUN git clone --depth=1 --branch v0.2.1 https://github.com/kangwonlee/gemini-python-tutor /app/temp/ && \
-#     python3 -m pip install --no-cache-dir --user --requirement /app/temp/requirements.txt && \
-#     mkdir -p /app/ai_tutor/ && \
-#     mv /app/temp/*.py /app/ai_tutor || true && \
-#     mv /app/temp/locale/ /app/ai_tutor/locale/ && \
-#     rm -rf /app/temp
-
-
-CMD ["python3", "-m", "pytest", "--version"]
 # end Dockerfile

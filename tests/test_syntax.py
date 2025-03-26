@@ -86,6 +86,10 @@ class ControlStatementChecker(ast.NodeVisitor):
         self.if_statements.append(node.lineno)
         self.generic_visit(node)
 
+    def visit_IfExp(self, node):
+        self.if_statements.append(node.lineno)
+        self.generic_visit(node)
+
     def visit_While(self, node):
         self.while_loops.append(node.lineno)
         self.generic_visit(node)
