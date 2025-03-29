@@ -1,6 +1,9 @@
 [project]
-name="python-pytest"
-version="2024.03.02"
+name="python-pytest-template-custom"
+version="2024.03.29"
 dependencies=[
-    "requests",
+    "pytest==8.3.5",
+    "pytest-json-report",
+    "pytest-xdist",
+    "requests==2.32.3",
 ]

@@ -63,16 +63,22 @@ jobs:
       - name: Checkout grader code
         uses: actions/checkout@v4
 
-      - name: Install Python dependencies for dispatch
+      - name: Install uv Package Manager
         uses: astral-sh/setup-uv@v5
         with:
-            version: "latest"
-            pyproject-file: "pyproject.toml"
+          enable-cache: true
+          version: "latest"
+
+      - name: Install requests
+        run: |
+          uv venv my_env
+          uv pip install requests
 
       - name: trigger repo dispatch
         env:
-            IMAGE_URL : ${{ needs.build-push.outputs.GHCR_IMAGE_NAME }}
-            TOKEN: ${{ secrets.BUILDER_PAT }}
-            Q_REPO: ${{ vars.Q_REPO }}
+          IMAGE_URL : ${{ needs.build-push.outputs.GHCR_IMAGE_NAME }}
+          TOKEN: ${{ secrets.BUILDER_PAT }}
+          Q_REPO: ${{ vars.Q_REPO }}
         run: |
-            python dispatch.py
+          . my_env/bin/activate
+          python dispatch.py
