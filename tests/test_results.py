@@ -1,13 +1,13 @@
 # begin tests/test_results.py
+import logging
 import pathlib
 import subprocess
 
 from typing import Callable, Tuple
 
-
 import pytest
 
-
+logging.basicConfig(level=logging.INFO)
 Run = Callable[[str], Tuple[str]]
 
 
