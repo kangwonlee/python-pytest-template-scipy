@@ -72,6 +72,7 @@ jobs:
       - name: Install requests
         run: |
           uv venv my_env
+          . my_env/bin/activate
           uv pip install requests
 
       - name: trigger repo dispatch
