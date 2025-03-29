@@ -1,6 +1,6 @@
 # begin tests/test_results.py
-import subprocess
 import pathlib
+import subprocess
 
 from typing import Callable, Tuple
 
@@ -28,6 +28,7 @@ def run_script(script_path: pathlib.Path, separator: str) -> Run:
         )
         if result.returncode != 0:
             raise RuntimeError(f"Script failed: {result.stderr}")
+        assert separator in result.stdout, f"Separator {separator!r} not found in output"
         return tuple(result.stdout.strip().split(separator)[-1].splitlines())
     return _run
 
