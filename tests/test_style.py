@@ -1,31 +1,24 @@
 # begin tests/test_style.py
-import os
 import pathlib
 import subprocess
+
 from typing import Tuple
 
 
 import pytest
 
 
-file_path = pathlib.Path(__file__)
-test_folder = file_path.parent.absolute()
-
-proj_folder = pathlib.Path(
-    os.getenv(
-        'STUDENT_CODE_FOLDER',
-        test_folder.parent.absolute()
-    )
-)
-
-
 def test_function_only_in_py_file(script_path:pathlib.Path):
-    with open(script_path, 'r') as file:
-        lines = file.readlines()
+    lines = tuple(
+        map(
+            lambda s: s.rstrip(),
+            script_path.read_text(encoding="utf-8").splitlines()
+        )
+    )
 
     for line in lines:
         line_strip = line.strip()
-        if line.startswith('#') or line.startswith('"""') or line.startswith("'''"):
+        if line.startswith('#') or line_strip.startswith('#') or line.startswith('"""') or line_strip.startswith("'''"):
             continue
         elif line.startswith('def ') and line_strip.endswith(':'):
             continue
@@ -35,7 +28,7 @@ def test_function_only_in_py_file(script_path:pathlib.Path):
 
 
 @pytest.fixture
-def git_log() -> Tuple[str]:
+def git_log(proj_folder:pathlib.Path) -> Tuple[str]:
     return tuple(
         subprocess.check_output(
             ['git', 'log', '--pretty=format"%h%x09%an%x09%ad%x09%s"'],
@@ -52,4 +45,9 @@ def test_git_log(git_log:Tuple[str]):
         if "github-classroom[bot]" != n:
             new_commits.append(line)
     assert new_commits, "No new commits"
+
+
+if __name__ == "__main__":
+    pytest.main(['--verbose', __file__])
+
 # end tests/test_style.py
