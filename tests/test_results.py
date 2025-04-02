@@ -51,6 +51,9 @@ def expected(n) -> np.ndarray:
 
 @pytest.fixture
 def x(expected:np.ndarray, a:float) -> Tuple[float]:
+    '''
+    to prevent answer code changing the input argument
+    '''
     return tuple((expected / a).tolist())
 
 
@@ -59,8 +62,16 @@ def result(a:float, x:Tuple[float]) -> List[float]:
     return exercise.mul_list_num(a, x)
 
 
-def test_is_return_none(result:List[int]):
-    assert result is not None, f"return value is None"
+def test_is_return_not_none(result:List[int]):
+    assert result is not None, "return value is None"
+
+
+def test_is_return_expected_type(result:List[int]):
+    assert isinstance(result, (list, tuple)), (
+        '\n'
+        "expected type : list or tuple\n"
+        f"return type : {type(result)}\n"
+    )
 
 
 def test_return_value_size(result:List[int], n:int):
