@@ -29,14 +29,16 @@ jobs:
 
       - name: Prep
         id: prep
-        env:
-          DOCKER_IMAGE_TAG: ${{ github.sha }}
         run: |
-          SHORT_SHA=$(echo $DOCKER_IMAGE_TAG | cut -c1-7)
-          echo "DOCKER_IMAGE_TAG=$SHORT_SHA" >> $GITHUB_ENV
-          echo "GHCR_IMAGE_NAME=ghcr.io/${{ github.repository }}:$SHORT_SHA" >> $GITHUB_ENV
-          echo "GHCR_IMAGE_NAME=ghcr.io/${{ github.repository }}:$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "GHCR_IMAGE_LATEST=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_ENV
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          ASSIGNMENT_NUM=$(echo "${{ github.repository }}" | grep -o '[/-][0-9]\{3\}' | head -1 | tr -d '/-')
+          GHCR_IMAGE_NAME="ghcr.io/${{ github.repository }}:${SHORT_SHA}"
+          GHCR_IMAGE_LATEST="ghcr.io/${{ github.repository }}:latest"
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_ENV
+          echo "ASSIGNMENT_NUM=$ASSIGNMENT_NUM" >> $GITHUB_ENV
+          echo "GHCR_IMAGE_NAME=${GHCR_IMAGE_NAME}" >> $GITHUB_ENV
+          echo "GHCR_IMAGE_NAME=${GHCR_IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "GHCR_IMAGE_LATEST=${GHCR_IMAGE_LATEST}" >> $GITHUB_ENV
 
       - name: Build and push
         id: build
@@ -61,28 +63,25 @@ jobs:
       - name: Checkout grader code
         uses: actions/checkout@v4
 
-      - name: Install the latest version of uv
+      - name: Install uv Package Manager
         uses: astral-sh/setup-uv@v5
         with:
+          enable-cache: true
           version: "latest"
-          pyproject-file: "pyproject.toml"
 
-      - name: Set env
+      - name: create venv
+        run: uv venv my_env
+
+      - name: Install requests
         run: |
-          . ./set_env.sh
-          echo "Q_REPO=$Q_REPO" >> $GITHUB_ENV
-
-        #   - name: Checkout Question Repository
-        #     uses: actions/checkout@v4
-        #     with:
-        #       repository: ${{ env.Q_REPO }}
-        #       path: q_repo
-        #       ref: main
-        #       token: ${{ secrets.BUILDER_PAT }}
+          . my_env/bin/activate
+          uv pip install requests
 
       - name: trigger repo dispatch
         env:
           IMAGE_URL : ${{ needs.build-push.outputs.GHCR_IMAGE_NAME }}
           TOKEN: ${{ secrets.BUILDER_PAT }}
+          Q_REPO: ${{ vars.Q_REPO }}
         run: |
+          . my_env/bin/activate
           python dispatch.py
