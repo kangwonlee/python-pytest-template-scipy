@@ -1,1 +1,1 @@
-export Q_REPO=kangwonlee/eca-hw-030
+export Q_REPO=kangwonlee/python-homework-template-custom
