@@ -6,7 +6,7 @@ USER root
 
 # TODO : verify branch name or set a version
 
-RUN git clone --depth=1 --branch feature/multi-service https://github.com/kangwonlee/gemini-python-tutor /app/temp/ \
+RUN git clone --depth=1 --branch v0.3.0 https://github.com/kangwonlee/gemini-python-tutor /app/temp/ \
     && mkdir -p /app/ai_tutor/ \
     && mv /app/temp/*.py /app/ai_tutor \
     && mv /app/temp/locale/ /app/ai_tutor/locale/
