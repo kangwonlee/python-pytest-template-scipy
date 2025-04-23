@@ -28,7 +28,6 @@ Template for grader image builders for python assignments
 
 - Builds a lightweight grader image with `pytest`.
 - Installs dependencies from `requirements.txt`.
-- Optional: Uncomment lines to include `gemini-python-tutor` (public repo) for LLM-generated test feedback—see [github.com/kangwonlee/gemini-python-tutor](https://github.com/kangwonlee/gemini-python-tutor).
 - Customize `CMD` to run your tests (e.g., `python3 -m pytest tests/`).
 
 ## Notes
