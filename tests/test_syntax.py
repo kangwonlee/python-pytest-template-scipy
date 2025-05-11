@@ -27,18 +27,34 @@ def test_syntax_validity(script_path:pathlib.Path, proj_folder:pathlib.Path):
 
 @pytest.fixture(scope="session")  # Session scope to share the allowed modules across tests
 def allowed_modules() -> Tuple[str]:
-    return ('numpy', 'pandas', 'matplotlib',)
+    return ('numpy', 'pandas', 'matplotlib', 'scipy')
 
 
 def test_allowed_imports(script_path:pathlib.Path, proj_folder:pathlib.Path, allowed_modules:Tuple[str]):
     for node in ast.walk(parse_code(script_path, proj_folder)):
         if isinstance(node, (ast.Import, ast.ImportFrom)):
             module_name = node.module if isinstance(node, ast.ImportFrom) else node.names[0].name
-            if module_name not in allowed_modules:
+            if not is_module_allowed(allowed_modules, module_name):
                 pytest.fail(
                     f"Import of disallowed module '{module_name}' in {str(script_path.relative_to(proj_folder))}\n"
                     f"{str(script_path.relative_to(proj_folder))} 파일에서 '{module_name}' 모듈을 import 않기 바랍니다."
                 )
+
+
+def is_module_allowed(allowed_modules:Tuple[str], module_name:str) -> bool:
+    """
+    Check if the module is allowed based on the allowed modules list.
+
+    If 'scipy' is allowed, 'scipy.stats' is also allowed.
+    """
+    if '.' in module_name:
+        # Check if the module is a submodule of an allowed module
+        base_module_name = module_name.split('.')[0]
+        b_allowed = base_module_name in allowed_modules
+    else:
+        b_allowed = module_name in allowed_modules
+
+    return b_allowed
 
 
 if __name__ == "__main__":
