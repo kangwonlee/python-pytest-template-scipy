@@ -1,6 +1,6 @@
 [project]
 name="eca-pytest-template-scipy"
-version="2024.05.11"
+version="2025.05.11"
 dependencies=[
    "matplotlib==3.10.1",
    "numpy==2.2.3",
