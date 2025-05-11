@@ -16,7 +16,7 @@ def test_function_only_in_py_file(script_path:pathlib.Path):
         )
     )
 
-    for line in lines:
+    for k, line in enumerate(lines):
         line_strip = line.strip()
         if line.startswith('#') or line_strip.startswith('#') or line.startswith('"""') or line_strip.startswith("'''"):
             continue
@@ -24,7 +24,10 @@ def test_function_only_in_py_file(script_path:pathlib.Path):
             continue
         elif line.startswith('import ') or (line.startswith('from ') and ' import ' in line):
             continue
-        assert line.startswith(' ') or line_strip == ''
+        assert line.startswith(' ') or line_strip == '', (
+            f"{k:4d}:{line} not in any function\n"
+            f"{k:4d}:{line} 는 어느 함수에도 포함되지 않음"
+        )
 
 
 @pytest.fixture
