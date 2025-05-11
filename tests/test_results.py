@@ -1,47 +1,101 @@
 # begin tests/test_results.py
 import logging
+import os
 import pathlib
-import subprocess
+import random
+import sys
+from typing import List, Tuple
 
-from typing import Callable, Tuple
 
+import numpy as np
+import numpy.random as nr
+import pandas as pd
 import pytest
 
-logging.basicConfig(level=logging.INFO)
-Run = Callable[[str], Tuple[str]]
+
+file_path = pathlib.Path(__file__)
+test_folder = file_path.parent.absolute()
+proj_folder = pathlib.Path(
+    os.getenv(
+        'STUDENT_CODE_FOLDER',
+        test_folder.parent.absolute()
+    )
+)
+
+
+sys.path.insert(
+    0,
+    str(proj_folder)
+)
+
+
+import exercise
+
+
+random.seed()
 
 
 @pytest.fixture
-def separator() -> str:
-    return ('-'*10) + '\n'
+def n() -> int:
+    return random.randint(5, 8)
 
 
 @pytest.fixture
-def run_script(script_path: pathlib.Path, separator: str) -> Run:
-    def _run(input_data: str) -> Tuple[str]:
-        result = subprocess.run(
-            ['python', str(script_path)],
-            input=input_data,
-            text=True,
-            capture_output=True,
-            timeout=5  # Prevent infinite loops
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"Script failed: {result.stderr}")
-        assert separator in result.stdout, f"Separator {separator!r} not found in output"
-        return tuple(result.stdout.strip().split(separator)[-1].splitlines())
-    return _run
+def a() -> float:
+    return (random.random() - 0.5) * 4
 
 
-# Sample test - educators should replace with their own logic
-def test_sample_output(run_script: Run):
-    input_data = "42"  # Example input
-    output = run_script(input_data)
-    expected = ("42",)  # Example expected output
-    assert output == expected, f"Expected {expected}, got {output}"
+@pytest.fixture
+def expected(n) -> np.ndarray:
+    return (nr.randint(-32, 31, (n,)) * 1.0)
 
 
-if __name__ == "__main__":
+@pytest.fixture
+def x(expected:np.ndarray, a:float) -> Tuple[float]:
+    '''
+    to prevent answer code changing the input argument
+    '''
+    return tuple((expected / a).tolist())
+
+
+@pytest.fixture
+def result(a:float, x:Tuple[float]) -> List[float]:
+    return exercise.mul_list_num(a, x)
+
+
+def test_is_return_not_none(result:List[int]):
+    assert result is not None, "return value is None"
+
+
+def test_is_return_expected_type(result:List[int]):
+    assert isinstance(result, (list, tuple)), (
+        '\n'
+        "expected type : list or tuple\n"
+        f"return type : {type(result)}\n"
+    )
+
+
+def test_return_value_size(result:List[int], n:int):
+    assert (len(result) == n), f"return value size={len(result)}, expected size = {n}"
+
+
+def test_isclose(result:List[int], a:Tuple[int], x:Tuple[int], expected:int):
+    df = pd.DataFrame(
+        data={'result': result, 'expected': expected},
+        columns=['result', 'expected']
+    )
+    df['is close'] = np.isclose(df['result'], df['expected'])
+
+    assert all(df['is close']), (
+        f"Some elements in the result are not close enough to the expected values when a={a} and x={x}:\n"
+        f"결과의 요소 중 a={a} x={x} 인 경우는 예상 값과 충분히 가깝지 않음.\n\n"
+        f"{df[~df['is close']].to_markdown(numalign='left', stralign='left', index=False)}\n\n"
+        "Please double-check your calculations for these elements.\n"
+        "이 요소들에 대한 계산을 다시 확인하기 바랍니다.\n"
+    )
+
+
+if "__main__" == __name__:
     pytest.main(['--verbose', __file__])
 
 # end tests/test_results.py
