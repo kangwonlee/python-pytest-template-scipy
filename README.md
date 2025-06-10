@@ -14,9 +14,9 @@ Template for grader image builders for python assignments
     1. Choose `Read and write permissions` and <kbd>Save</kbd>.
 1. Edit `tests/test_syntax.py` to set allowed modules and functions.
 1. Customize `tests/test_results.py` to define the expected results.
-1. Push to GitHub : `build.yml` builds your image and pushes to GHCR.
+1. Push to GitHub : `build.yml` builds your image and pushes to GHCR (GitHub Container Repository).
 * `script_path` fixture will be available if your test script in the `tests/` folder imports `pytest`.
-* Customize `requirements.txt` to include additional dependencies or change the test command.
+* Currently `requirements.txt` is for documentation purpose.
 
 ## CI/CD Workflow
 
@@ -32,4 +32,4 @@ Template for grader image builders for python assignments
 
 ## Notes
 
-- A non-docker version would be available soon.
+- This template is registered as a part of #C-2025-016393 in the Korea Copyright Commission.

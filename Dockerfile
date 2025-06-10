@@ -4,7 +4,7 @@ FROM ghcr.io/kangwonlee/edu-base-raw:5ea7aa8
 
 USER root
 
-RUN git clone --depth=1 --branch v0.3.2 https://github.com/kangwonlee/gemini-python-tutor /app/temp/ \
+RUN git clone --depth=1 --branch v0.3.3 https://github.com/kangwonlee/gemini-python-tutor /app/temp/ \
     && mkdir -p /app/ai_tutor/ \
     && mv /app/temp/*.py /app/ai_tutor \
     && mv /app/temp/locale/ /app/ai_tutor/locale/
