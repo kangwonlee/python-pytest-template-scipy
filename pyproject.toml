@@ -3,7 +3,7 @@ name="python-pytest-template-custom"
 version="2025.03.29"
 dependencies=[
     "pytest==8.3.5",
-    "pytest-json-report",
-    "pytest-xdist",
+    "pytest-json-report==1.5.0",
+    "pytest-xdist==3.6.1",
     "requests==2.32.4",
 ]
