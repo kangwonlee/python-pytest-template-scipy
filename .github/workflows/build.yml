@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -61,7 +61,7 @@ jobs:
     needs : build-push
     steps:
       - name: Checkout grader code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install uv Package Manager
         uses: astral-sh/setup-uv@v6
