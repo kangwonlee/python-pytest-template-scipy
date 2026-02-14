@@ -2,6 +2,12 @@
 name: Build Grader Image
 on:
   push:
+    paths:
+      - 'tests/**'
+      - 'unit_tests/**'
+      - Dockerfile
+      - requirements.txt
+      - '.github/**'
   workflow_dispatch:
 
 jobs:
@@ -10,6 +16,26 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Create virtual environment
+        run: uv venv .venv --python 3.11
+
+      - name: Install dependencies
+        run: uv pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: |
+          source .venv/bin/activate
+          if [ -d "unit_tests" ]; then
+            pytest unit_tests/ -v --tb=short
+          else
+            echo "No unit_tests directory found, skipping unit tests"
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
