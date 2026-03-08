@@ -2,12 +2,6 @@
 name: Build Grader Image
 on:
   push:
-    paths:
-      - 'tests/**'
-      - 'unit_tests/**'
-      - Dockerfile
-      - requirements.txt
-      - '.github/**'
   workflow_dispatch:
 
 permissions:
