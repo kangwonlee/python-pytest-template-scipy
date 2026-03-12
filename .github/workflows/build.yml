@@ -4,24 +4,48 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Create virtual environment
+        run: uv venv .venv --python 3.11
+
+      - name: Install dependencies
+        run: uv pip install .
+
+      - name: Run unit tests
+        run: |
+          source .venv/bin/activate
+          if [ -d "unit_tests" ]; then
+            pytest unit_tests/ -v --tb=short
+          else
+            echo "No unit_tests directory found, skipping unit tests"
+          fi
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: linux/arm64,linux/amd64
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -61,11 +85,10 @@ jobs:
     needs : build-push
     steps:
       - name: Checkout grader code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install uv Package Manager
-        uses: astral-sh/setup-uv@v6
-
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           version: "latest"
