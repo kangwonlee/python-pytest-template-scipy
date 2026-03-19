@@ -7,7 +7,7 @@ import pytest
 
 
 canary_tests_folder = pathlib.Path(__file__).parent.resolve()
-proj_folder = unittests_folder.parent.resolve()
+proj_folder = canary_tests_folder.parent.resolve()
 tests_folder = proj_folder / 'tests'
 
 
