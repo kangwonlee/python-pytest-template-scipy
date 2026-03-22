@@ -1,3 +1,6 @@
 # Sample failing submission for the template grader.
-# Produces wrong output: "wrong" instead of echoing the input.
-print("wrong")
+# Returns wrong values: adds instead of multiplies.
+
+
+def mul_list_num(a, x):
+    return [a + xi for xi in x]

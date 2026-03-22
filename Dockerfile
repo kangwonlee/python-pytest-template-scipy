@@ -1,6 +1,6 @@
 # begin Dockerfile
 
-FROM ghcr.io/kangwonlee/edu-scipy:0.3.1
+FROM ghcr.io/kangwonlee/edu-scipy:0.3.2
 
 USER root
 
