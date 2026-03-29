@@ -13,6 +13,9 @@ RUN uv pip install --system --requirement /app/temp/requirements.txt \
     && rm -rf /app/temp \
     && chown -R runner:runner /app/ai_tutor/
 
+COPY pyproject.toml /app/pyproject.toml
+RUN uv pip install --no-cache-dir --system /app/
+
 USER runner
 WORKDIR /tests/
 
